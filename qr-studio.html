@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>adambirgün · QR Studio</title>
+<meta name="description" content="Adambirgün ücretsiz QR kod oluşturucu. URL, Wi-Fi, vCard, Geo ve daha fazlası. Logo ekle, renk seç, PNG veya SVG indir."/>
+<meta name="robots" content="index,follow"/>
+<meta name="author" content="adambirgun"/>
+<meta name="geo.region" content="TR-07"/>
+<meta name="geo.placename" content="Antalya"/>
+<meta name="geo.position" content="36.8969;30.7133"/>
+<meta name="ICBM" content="36.8969, 30.7133"/>
+<meta property="og:title" content="adambirgün · QR Studio"/>
+<meta property="og:description" content="Ücretsiz, minimal ve tam özellikli QR üretici."/>
+<meta property="og:locale" content="tr_TR"/>
+<meta name="theme-color" content="#f9f8f6"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9f8f6;--fg:#0e0e0e;--mid:#7a7a7a;--soft:#c8c5bf;--line:#e5e2dc;
+  --surface:#ffffff;--surface-2:#f3f1ee;
+  --r:20px;
+  --f-sans:'DM Sans',sans-serif;--f-mono:'DM Mono',monospace;
+}
+html{height:100%} body{min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--f-sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+input,select,textarea{background:none;border:none;outline:none;width:100%}
+textarea{resize:vertical}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--soft);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ─── DESKTOP LAYOUT ────────────────── */
+.app{display:grid;grid-template-columns:64px 280px 1fr 360px;grid-template-rows:100vh;overflow:hidden}
+
+/* RAIL */
+.rail{grid-column:1;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:4px;overflow:hidden}
+.rail-logo{width:38px;height:38px;border-radius:12px;background:var(--fg);color:var(--bg);display:grid;place-items:center;margin-bottom:16px;flex-shrink:0}
+.rail-ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--mid)}
+.rail-ico.on,.rail-ico:hover{background:var(--surface-2);color:var(--fg)}
+.rail-ico svg{width:19px;height:19px}
+.rail-spacer{flex:1}
+
+/* SIDEBAR */
+.sidebar{grid-column:2;border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+.sb-head{padding:22px 18px 14px;border-bottom:1px solid var(--line)}
+.sb-head h2{font-size:11px;font-weight:500;color:var(--mid);letter-spacing:.08em;text-transform:uppercase}
+.sb-head p{margin-top:4px;font-size:22px;font-weight:700;letter-spacing:-.04em;line-height:1.1}
+.sb-sec{padding:16px 18px;border-bottom:1px solid var(--line)}
+.sb-label{font-size:10px;font-weight:600;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:7px 13px;border-radius:999px;border:1px solid var(--line);font-size:13px;background:var(--surface)}
+.pill.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tc{padding:11px 10px;border-radius:13px;border:1px solid var(--line);background:var(--surface);text-align:left}
+.tc strong{display:block;font-size:13px;font-weight:600}
+.tc span{display:block;font-size:11px;color:var(--mid);margin-top:2px}
+.tc.on{background:var(--fg);border-color:var(--fg)}
+.tc.on strong,.tc.on span{color:var(--bg)}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.stat{padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.stat strong{display:block;font-size:18px;font-weight:700;letter-spacing:-.04em}
+.stat span{font-size:11px;color:var(--mid);margin-top:2px;display:block}
+
+/* CANVAS */
+.canvas{grid-column:3;display:grid;grid-template-rows:56px 1fr 60px;border-right:1px solid var(--line);overflow:hidden}
+.canvas-top{padding:0 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.breadcrumb{font-size:13px;color:var(--mid);display:flex;align-items:center;gap:7px}
+.breadcrumb strong{color:var(--fg);font-weight:600}
+.canvas-stage{display:grid;place-items:center;background:var(--surface-2);overflow:hidden;padding:28px}
+.qr-frame{background:#fff;border-radius:26px;box-shadow:0 2px 0 var(--line),0 10px 40px rgba(0,0,0,.07);padding:20px;display:grid;place-items:center;width:min(100%,380px);aspect-ratio:1}
+#qrMount{width:100%;display:grid;place-items:center}
+.canvas-bar{padding:0 22px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.canvas-bar-end{margin-left:auto;display:flex;gap:8px}
+.btn{padding:9px 18px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:500;background:var(--surface);cursor:pointer}
+.btn-dark{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:hover{background:var(--surface-2)}
+.btn-dark:hover{background:#333;border-color:#333}
+
+/* INSPECTOR */
+.inspector{grid-column:4;overflow-y:auto;display:flex;flex-direction:column}
+.ins-head{padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+.ins-head h3{font-size:11px;font-weight:500;color:var(--mid);letter-spacing:.08em;text-transform:uppercase}
+.ins-head p{margin-top:4px;font-size:20px;font-weight:700;letter-spacing:-.04em}
+.ins-sec{padding:16px 20px;border-bottom:1px solid var(--line)}
+.ins-label{font-size:10px;font-weight:600;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inp-wrap{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.inp-wrap label{display:block;font-size:10px;font-weight:600;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px 0}
+.inp-wrap input,.inp-wrap select,.inp-wrap textarea{display:block;padding:3px 12px 9px;font-size:14px;width:100%}
+.inp-wrap textarea{padding:8px 12px;min-height:78px}
+#dynamicForm{display:grid;gap:8px}
+.csw{border:1px solid var(--line);border-radius:12px;background:var(--surface);display:flex;align-items:center;padding:8px 12px;gap:9px;cursor:pointer}
+.cprev{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);flex-shrink:0}
+.csw span{font-size:13px;flex:1}
+.csw input[type="color"]{opacity:0;position:absolute;width:0;height:0}
+.palette-strip{display:flex;gap:7px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:10px;border:2px solid transparent;cursor:pointer;overflow:hidden;flex-shrink:0}
+.sw.on{border-color:var(--fg)}
+
+/* range slider */
+.sl-row{display:grid;gap:5px}
+.sl-row .sl-top{display:flex;justify-content:space-between;font-size:12px;color:var(--mid)}
+.sl-row .sl-top strong{color:var(--fg)}
+.sl-row input[type="range"]{width:100%;height:4px;border-radius:4px;accent-color:var(--fg);cursor:pointer}
+
+/* style chips */
+.style-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.stl{padding:9px 0;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-size:12px;text-align:center}
+.stl.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* site logo upload */
+.logo-upload-area{border:1.5px dashed var(--soft);border-radius:14px;padding:20px;text-align:center;cursor:pointer;background:var(--surface);transition:border-color .15s}
+.logo-upload-area:hover{border-color:var(--fg)}
+.logo-upload-area strong{display:block;font-size:14px;margin-bottom:4px}
+.logo-upload-area p{font-size:12px;color:var(--mid)}
+.logo-preview-box{margin-top:12px;display:none;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.logo-preview-box img{max-height:40px;max-width:80px;border-radius:6px}
+.logo-preview-box span{font-size:12px;color:var(--mid);flex:1}
+
+/* ins footer */
+.ins-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--mid);line-height:1.7}
+.ins-footer a{color:var(--fg);font-weight:500}
+
+/* ─── MOBILE ────────────────────────── */
+@media(max-width:900px){
+  .app{display:block;grid-template-columns:none;grid-template-rows:none;height:auto;overflow:visible}
+  .rail{flex-direction:row;height:54px;padding:0 16px;gap:8px;border-right:none;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:50}
+  .rail-logo{margin-bottom:0;margin-right:8px;width:34px;height:34px}
+  .rail-spacer{flex:1}
+  .sidebar{border-right:none;border-bottom:1px solid var(--line);overflow-y:visible}
+  .canvas{display:block;border-right:none;border-bottom:1px solid var(--line)}
+  .canvas-top{height:46px}
+  .canvas-stage{min-height:340px;padding:20px}
+  .canvas-bar{height:auto;padding:12px 16px;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line)}
+  .canvas-bar-end{margin-left:0;width:100%}
+  .canvas-bar-end .btn{flex:1}
+  .inspector{border-right:none}
+  .ins-footer{border-top:1px solid var(--line)}
+  .type-grid{grid-template-columns:repeat(4,1fr)}
+  .style-row{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr 1fr}
+  .stat-row{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:540px){
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- RAIL -->
+  <nav class="rail">
+    <div class="rail-logo" aria-label="adambirgün">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <path d="M4 4H10V10H4V4ZM14 4H20V10H14V4ZM4 14H10V20H4V14Z" fill="currentColor"/>
+        <path d="M14 14H17V17H14V14ZM17 17H20V20H17V17ZM17 11H20V14H17V11ZM11 17H14V20H11V17Z" fill="currentColor"/>
+      </svg>
+    </div>
+    <button class="rail-ico on" title="QR Oluştur">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM17 17h3v3h-3zM17 11h3v3h-3zM11 17h3v3h-3z"/></svg>
+    </button>
+    <button class="rail-ico" title="Analitik">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </button>
+    <div class="rail-spacer"></div>
+    <button class="rail-ico" title="Ayarlar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-head">
+      <h2>Mod</h2>
+      <p>QR Oluştur</p>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-label">QR Modu</div>
+      <div class="pill-row" id="modePills">
+        <button class="pill on" data-mode="static">Statik</button>
+        <button class="pill" data-mode="dynamic">Dinamik</button>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-label">İçerik Türü</div>
+      <div class="type-grid" id="typeTabs">
+        <button class="tc on" data-type="url"><strong>URL</strong><span>Web adresi</span></button>
+        <button class="tc" data-type="text"><strong>Text</strong><span>Mesaj</span></button>
+        <button class="tc" data-type="wifi"><strong>Wi‑Fi</strong><span>Ağ</span></button>
+        <button class="tc" data-type="email"><strong>Email</strong><span>Hazır mail</span></button>
+        <button class="tc" data-type="phone"><strong>Telefon</strong><span>Arama</span></button>
+        <button class="tc" data-type="sms"><strong>SMS</strong><span>Mesaj</span></button>
+        <button class="tc" data-type="vcard"><strong>vCard</strong><span>Kartvizit</span></button>
+        <button class="tc" data-type="geo"><strong>Geo</strong><span>Konum</span></button>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-label">Bilgi</div>
+      <div class="stat-row">
+        <div class="stat"><strong>8</strong><span>Tür</span></div>
+        <div class="stat"><strong>PNG</strong><span>+ SVG</span></div>
+        <div class="stat"><strong>Logo</strong><span>Merkez</span></div>
+        <div class="stat"><strong>Ücretsiz</strong><span>Sınırsız</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CANVAS -->
+  <main class="canvas">
+    <div class="canvas-top">
+      <div class="breadcrumb">
+        adambirgün · QR Studio
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <strong id="canvasTypeName">URL</strong>
+      </div>
+      <div style="font-size:12px;color:var(--mid);font-family:var(--f-mono)" id="canvasSize">420 × 420 px</div>
+    </div>
+    <div class="canvas-stage">
+      <div class="qr-frame">
+        <div id="qrMount"></div>
+      </div>
+    </div>
+    <div class="canvas-bar">
+      <div style="flex:1;min-width:160px">
+        <div class="sl-row">
+          <div class="sl-top"><span>QR Boyutu</span><strong><span id="canvasSzNum">420</span> px</strong></div>
+          <input type="range" id="canvasSzSlider" min="180" max="900" step="20" value="420"/>
+        </div>
+      </div>
+      <div class="canvas-bar-end">
+        <button class="btn" id="btnSvg">SVG</button>
+        <button class="btn" id="btnPngTransparent">Şeffaf PNG</button>
+        <button class="btn btn-dark" id="btnPng">PNG İndir</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- INSPECTOR -->
+  <aside class="inspector">
+    <div class="ins-head">
+      <h3>Inspector</h3>
+      <p>Özelleştir</p>
+    </div>
+
+    <!-- İçerik formu -->
+    <div class="ins-sec">
+      <div class="ins-label">İçerik</div>
+      <div id="dynamicForm"></div>
+    </div>
+
+    <!-- Stil -->
+    <div class="ins-sec">
+      <div class="ins-label">Modül Stili</div>
+      <div class="style-row" id="styleTabs">
+        <button class="stl on" data-dots="rounded" data-corners="extra-rounded">Soft</button>
+        <button class="stl" data-dots="square" data-corners="square">Sharp</button>
+        <button class="stl" data-dots="dots" data-corners="dot">Dots</button>
+        <button class="stl" data-dots="classy-rounded" data-corners="classy-rounded">Classy</button>
+      </div>
+    </div>
+
+    <!-- Renkler -->
+    <div class="ins-sec">
+      <div class="ins-label">Renkler</div>
+      <div class="row2">
+        <div class="csw" onclick="document.getElementById('c_dot').click()">
+          <div class="cprev" id="p_dot" style="background:#111111"></div><span>QR Rengi</span>
+          <input type="color" id="c_dot" value="#111111"/>
+        </div>
+        <div class="csw" onclick="document.getElementById('c_bg').click()">
+          <div class="cprev" id="p_bg" style="background:#ffffff"></div><span>Fon</span>
+          <input type="color" id="c_bg" value="#ffffff"/>
+        </div>
+        <div class="csw" onclick="document.getElementById('c_corner').click()">
+          <div class="cprev" id="p_corner" style="background:#111111"></div><span>Köşe</span>
+          <input type="color" id="c_corner" value="#111111"/>
+        </div>
+        <div class="csw" onclick="document.getElementById('c_cdot').click()">
+          <div class="cprev" id="p_cdot" style="background:#888888"></div><span>Köşe İç</span>
+          <input type="color" id="c_cdot" value="#888888"/>
+        </div>
+      </div>
+      <div class="palette-strip" id="presets" style="margin-top:12px">
+        <button class="sw on" data-dot="#111111" data-bg="#ffffff" data-corner="#111111" data-cd="#888888"><div style="background:linear-gradient(135deg,#111 0 50%,#fff 50%);width:100%;height:100%"></div></button>
+        <button class="sw" data-dot="#1a1a2e" data-bg="#f0f0ff" data-corner="#6c63ff" data-cd="#a29bfe"><div style="background:linear-gradient(135deg,#1a1a2e 0 50%,#f0f0ff 50%);width:100%;height:100%"></div></button>
+        <button class="sw" data-dot="#064e3b" data-bg="#ecfdf5" data-corner="#059669" data-cd="#6ee7b7"><div style="background:linear-gradient(135deg,#064e3b 0 50%,#ecfdf5 50%);width:100%;height:100%"></div></button>
+        <button class="sw" data-dot="#7c2d12" data-bg="#fff7ed" data-corner="#ea580c" data-cd="#fdba74"><div style="background:linear-gradient(135deg,#7c2d12 0 50%,#fff7ed 50%);width:100%;height:100%"></div></button>
+        <button class="sw" data-dot="#1e1b4b" data-bg="#faf5ff" data-corner="#7c3aed" data-cd="#c4b5fd"><div style="background:linear-gradient(135deg,#1e1b4b 0 50%,#faf5ff 50%);width:100%;height:100%"></div></button>
+        <button class="sw" data-dot="#0c4a6e" data-bg="#f0f9ff" data-corner="#0284c7" data-cd="#7dd3fc"><div style="background:linear-gradient(135deg,#0c4a6e 0 50%,#f0f9ff 50%);width:100%;height:100%"></div></button>
+      </div>
+    </div>
+
+    <!-- Kenar boşluğu -->
+    <div class="ins-sec">
+      <div class="ins-label">Kenar Boşluğu</div>
+      <div class="sl-row">
+        <div class="sl-top"><span>Margin</span><strong><span id="marginVal">14</span> px</strong></div>
+        <input type="range" id="marginSlider" min="0" max="48" step="2" value="14"/>
+      </div>
+    </div>
+
+
+    <!-- Export -->
+    <div class="ins-sec">
+      <div class="ins-label">İndirme Seçenekleri</div>
+      <div class="row2">
+        <button class="pill on" id="bgSolidBtn" type="button">Dolu Arka Plan</button>
+        <button class="pill" id="bgTransparentBtn" type="button">Transparan Arka Plan</button>
+      </div>
+      <p style="font-size:12px;color:var(--mid);margin-top:10px">Şeffaf indirmede QR arka planı transparan olur. Özellikle ürün görselleri ve mockup kullanımında uygundur.</p>
+    </div>
+
+    <!-- QR Logosu (orta) -->
+    <div class="ins-sec">
+      <div class="ins-label">QR Merkez Logosu</div>
+      <div class="logo-upload-area" id="qrLogoDrop">
+        <strong>Logo yükle</strong>
+        <p>PNG, SVG veya JPEG · QR ortasına yerleşir</p>
+        <input type="file" id="qrLogoFile" accept="image/*" style="display:none"/>
+      </div>
+      <div class="logo-preview-box" id="qrLogoPreviewBox">
+        <img id="qrLogoPreviewImg" src="" alt="QR Logo"/>
+        <span id="qrLogoFileName">—</span>
+        <button class="btn" style="padding:6px 14px;font-size:12px" id="clearQrLogo">Kaldır</button>
+      </div>
+      <div class="sl-row" style="margin-top:12px">
+        <div class="sl-top"><span>Logo boyutu</span><strong><span id="qrLogoSzVal">22</span>%</strong></div>
+        <input type="range" id="qrLogoSzSlider" min="0.12" max="0.32" step="0.01" value="0.22"/>
+      </div>
+    </div>
+
+    <!-- Site logosu -->
+    <div class="ins-sec">
+      <div class="ins-label">Site / Marka Logosu</div>
+      <div class="logo-upload-area" id="siteLogoDrop">
+        <strong>Site logonu yükle</strong>
+        <p>PNG, SVG veya JPEG · Sayfanın üst kısmında görünür</p>
+        <input type="file" id="siteLogoFile" accept="image/*" style="display:none"/>
+      </div>
+      <div class="logo-preview-box" id="siteLogoPreviewBox">
+        <img id="siteLogoImg" src="" alt="Site Logo"/>
+        <span id="siteLogoFileName">—</span>
+        <button class="btn" style="padding:6px 14px;font-size:12px" id="clearSiteLogo">Kaldır</button>
+      </div>
+    </div>
+
+    <div class="ins-footer">
+      <strong style="color:var(--fg)">adambirgün · QR Studio</strong><br/>
+      Antalya · Ücretsiz QR üretimi<br/>
+      <a href="mailto:isletmemkolay@gmil.com">isletmemkolay@gmil.com</a>
+    </div>
+  </aside>
+</div>
+
+<!-- Site logo overlay (header) -->
+<div id="siteLogoHeader" style="display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none;background:rgba(249,248,246,.9);padding:6px 16px;border-radius:999px;border:1px solid var(--line);backdrop-filter:blur(10px)">
+  <img id="siteLogoHeaderImg" src="" alt="Site Logo" style="height:32px;max-width:140px;object-fit:contain"/>
+</div>
+
+<script>
+const templates = {
+  url:`<div class="inp-wrap"><label>Hedef URL</label><input id="urlVal" type="url" value="https://example.com"/></div><div class="inp-wrap dynamic-only" style="display:none"><label>Kısa Bağlantı (Dinamik)</label><input id="dynShort" type="url" value="https://qr.adambirgun.com/abc1"/></div>`,
+  text:`<div class="inp-wrap"><label>Metin</label><textarea id="textVal">Merhaba, QR ile paylaşılan içerik.</textarea></div>`,
+  wifi:`<div class="inp-wrap"><label>Wi-Fi Adı (SSID)</label><input id="wifiSsid" value="OfficeGuest"/></div><div class="row2"><div class="inp-wrap"><label>Şifre</label><input id="wifiPass" value="Password123"/></div><div class="inp-wrap"><label>Güvenlik</label><select id="wifiType"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">Şifresiz</option></select></div></div>`,
+  email:`<div class="inp-wrap"><label>E-posta</label><input id="emailTo" type="email" value="isletmemkolay@gmil.com"/></div><div class="inp-wrap"><label>Konu</label><input id="emailSubj" value="Merhaba"/></div><div class="inp-wrap"><label>Mesaj</label><textarea id="emailBody">Bilgi almak istiyorum.</textarea></div>`,
+  phone:`<div class="inp-wrap"><label>Telefon</label><input id="phoneVal" type="tel" value="+905555555555"/></div>`,
+  sms:`<div class="inp-wrap"><label>Telefon</label><input id="smsPhone" type="tel" value="+905555555555"/></div><div class="inp-wrap"><label>Mesaj</label><textarea id="smsBody">Merhaba, bilgi istiyorum.</textarea></div>`,
+  vcard:`<div class="row2"><div class="inp-wrap"><label>Ad</label><input id="vcFirst" value="Adam"/></div><div class="inp-wrap"><label>Soyad</label><input id="vcLast" value="Birgün"/></div></div><div class="row2"><div class="inp-wrap"><label>Telefon</label><input id="vcPhone" value="+905555555555"/></div><div class="inp-wrap"><label>E-posta</label><input id="vcEmail" value="isletmemkolay@gmil.com"/></div></div><div class="inp-wrap"><label>Şirket</label><input id="vcOrg" value="adambirgün"/></div><div class="inp-wrap"><label>Web Sitesi</label><input id="vcUrl" value="https://example.com"/></div>`,
+  geo:`<div class="row2"><div class="inp-wrap"><label>Enlem (Lat)</label><input id="geoLat" value="36.8969"/></div><div class="inp-wrap"><label>Boylam (Lng)</label><input id="geoLng" value="30.7133"/></div></div><div class="inp-wrap"><label>Konum Etiketi</label><input id="geoLabel" value="Antalya, Türkiye"/></div>`
+};
+const typeNames={url:'URL',text:'Text',wifi:'Wi‑Fi',email:'Email',phone:'Telefon',sms:'SMS',vcard:'vCard',geo:'Geo'};
+let mode='static',type='url',dots='rounded',corners='extra-rounded',qrLogo='',transparentBg=false;
+
+const qr=new QRCodeStyling({width:420,height:420,type:'svg',data:'https://example.com',margin:14,qrOptions:{errorCorrectionLevel:'H'},imageOptions:{crossOrigin:'anonymous',margin:4,imageSize:.22,hideBackgroundDots:true},dotsOptions:{color:'#111111',type:'rounded'},backgroundOptions:{color:'#ffffff'},cornersSquareOptions:{color:'#111111',type:'extra-rounded'},cornersDotOptions:{color:'#888888',type:'dot'}});
+qr.append(document.getElementById('qrMount'));
+
+function getPayload(){
+  if(type==='url') return mode==='dynamic'?(document.getElementById('dynShort')?.value||''):(document.getElementById('urlVal')?.value||'https://example.com');
+  if(type==='text') return document.getElementById('textVal')?.value||'';
+  if(type==='wifi'){const s=document.getElementById('wifiSsid')?.value||'';const p=document.getElementById('wifiPass')?.value||'';const t=document.getElementById('wifiType')?.value||'WPA';return `WIFI:T:${t};S:${s};P:${p};;`;}
+  if(type==='email'){const to=document.getElementById('emailTo')?.value||'';const s=encodeURIComponent(document.getElementById('emailSubj')?.value||'');const b=encodeURIComponent(document.getElementById('emailBody')?.value||'');return `mailto:${to}?subject=${s}&body=${b}`;}
+  if(type==='phone') return `tel:${document.getElementById('phoneVal')?.value||''}`;
+  if(type==='sms'){const p=document.getElementById('smsPhone')?.value||'';const b=encodeURIComponent(document.getElementById('smsBody')?.value||'');return `sms:${p}?body=${b}`;}
+  if(type==='vcard'){const f=document.getElementById('vcFirst')?.value||'';const l=document.getElementById('vcLast')?.value||'';const ph=document.getElementById('vcPhone')?.value||'';const em=document.getElementById('vcEmail')?.value||'';const org=document.getElementById('vcOrg')?.value||'';const u=document.getElementById('vcUrl')?.value||'';return `BEGIN:VCARD\nVERSION:3.0\nN:${l};${f};;;\nFN:${f} ${l}\nORG:${org}\nTEL:${ph}\nEMAIL:${em}\nURL:${u}\nEND:VCARD`;}
+  if(type==='geo'){const lat=document.getElementById('geoLat')?.value||'';const lng=document.getElementById('geoLng')?.value||'';return `geo:${lat},${lng}`;}
+  return 'https://example.com';
+}
+
+function render(){
+  const sz=Number(document.getElementById('canvasSzSlider').value);
+  const mg=Number(document.getElementById('marginSlider').value);
+  const lsz=Number(document.getElementById('qrLogoSzSlider').value);
+  const dc=document.getElementById('c_dot').value;
+  const bc=document.getElementById('c_bg').value;
+  const effectiveBg = transparentBg ? 'transparent' : bc;
+  const cc=document.getElementById('c_corner').value;
+  const cdc=document.getElementById('c_cdot').value;
+  document.getElementById('canvasSzNum').textContent=sz;
+  document.getElementById('canvasSize').textContent=`${sz} × ${sz} px`;
+  document.getElementById('marginVal').textContent=mg;
+  document.getElementById('qrLogoSzVal').textContent=Math.round(lsz*100);
+  document.getElementById('p_dot').style.background=dc;
+  document.getElementById('p_bg').style.background=transparentBg ? 'linear-gradient(135deg,#fff 0 50%,#dcdcdc 50% 100%)' : bc;
+  document.getElementById('p_corner').style.background=cc;
+  document.getElementById('p_cdot').style.background=cdc;
+  qr.update({width:sz,height:sz,data:getPayload(),margin:mg,image:qrLogo,
+    imageOptions:{crossOrigin:'anonymous',margin:4,imageSize:lsz,hideBackgroundDots:true},
+    dotsOptions:{color:dc,type:dots},backgroundOptions:{color:effectiveBg},
+    cornersSquareOptions:{color:cc,type:corners},cornersDotOptions:{color:cdc,type:'dot'}});
+}
+
+function mountForm(){
+  document.getElementById('dynamicForm').innerHTML=templates[type];
+  document.getElementById('dynamicForm').querySelectorAll('input,select,textarea').forEach(el=>{el.addEventListener('input',render);el.addEventListener('change',render);});
+  document.querySelectorAll('.dynamic-only').forEach(el=>el.style.display=mode==='dynamic'?'block':'none');
+  document.getElementById('canvasTypeName').textContent=typeNames[type];
+  render();
+}
+
+// Mode pills
+document.querySelectorAll('#modePills .pill').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('#modePills .pill').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.dynamic-only').forEach(el=>el.style.display=mode==='dynamic'?'block':'none');render();}));
+// Type tabs
+document.querySelectorAll('#typeTabs .tc').forEach(b=>b.addEventListener('click',()=>{type=b.dataset.type;document.querySelectorAll('#typeTabs .tc').forEach(x=>x.classList.remove('on'));b.classList.add('on');mountForm();}));
+// Style
+document.querySelectorAll('#styleTabs .stl').forEach(b=>b.addEventListener('click',()=>{dots=b.dataset.dots;corners=b.dataset.corners;document.querySelectorAll('#styleTabs .stl').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();}));
+// Presets
+document.querySelectorAll('#presets .sw').forEach(b=>b.addEventListener('click',()=>{document.getElementById('c_dot').value=b.dataset.dot;document.getElementById('c_bg').value=b.dataset.bg;document.getElementById('c_corner').value=b.dataset.corner;document.getElementById('c_cdot').value=b.dataset.cd;document.querySelectorAll('#presets .sw').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();}));
+// Sliders & color inputs
+['c_dot','c_bg','c_corner','c_cdot','canvasSzSlider','marginSlider','qrLogoSzSlider'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+
+// QR center logo
+document.getElementById('qrLogoDrop').addEventListener('click',()=>document.getElementById('qrLogoFile').click());
+document.getElementById('qrLogoFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{qrLogo=r.result;document.getElementById('qrLogoPreviewImg').src=r.result;document.getElementById('qrLogoFileName').textContent=f.name;document.getElementById('qrLogoPreviewBox').style.display='flex';render();};r.readAsDataURL(f);});
+document.getElementById('clearQrLogo').addEventListener('click',()=>{qrLogo='';document.getElementById('qrLogoFile').value='';document.getElementById('qrLogoPreviewBox').style.display='none';render();});
+
+// Site logo
+document.getElementById('siteLogoDrop').addEventListener('click',()=>document.getElementById('siteLogoFile').click());
+document.getElementById('siteLogoFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('siteLogoImg').src=r.result;document.getElementById('siteLogoFileName').textContent=f.name;document.getElementById('siteLogoPreviewBox').style.display='flex';document.getElementById('siteLogoHeaderImg').src=r.result;document.getElementById('siteLogoHeader').style.display='block';};r.readAsDataURL(f);});
+document.getElementById('clearSiteLogo').addEventListener('click',()=>{document.getElementById('siteLogoFile').value='';document.getElementById('siteLogoPreviewBox').style.display='none';document.getElementById('siteLogoHeader').style.display='none';});
+
+// Export background mode
+document.getElementById('bgSolidBtn').addEventListener('click',()=>{transparentBg=false;document.getElementById('bgSolidBtn').classList.add('on');document.getElementById('bgTransparentBtn').classList.remove('on');render();});
+document.getElementById('bgTransparentBtn').addEventListener('click',()=>{transparentBg=true;document.getElementById('bgTransparentBtn').classList.add('on');document.getElementById('bgSolidBtn').classList.remove('on');render();});
+
+// Export
+document.getElementById('btnPng').addEventListener('click',()=>{const prev=transparentBg;transparentBg=false;render();setTimeout(()=>{qr.download({name:'adambirgun-qr',extension:'png'});transparentBg=prev;render();},60);});
+document.getElementById('btnPngTransparent').addEventListener('click',()=>{const prev=transparentBg;transparentBg=true;render();setTimeout(()=>{qr.download({name:'adambirgun-qr-transparent',extension:'png'});transparentBg=prev;render();},60);});
+document.getElementById('btnSvg').addEventListener('click',()=>qr.download({name:'adambirgun-qr',extension:'svg'}));
+
+mountForm();
+</script>
+</body>
+</html>
