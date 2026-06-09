@@ -115,6 +115,15 @@ textarea{resize:vertical}
 .stl{padding:9px 0;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-size:12px;text-align:center}
 .stl.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
+/* site logo upload */
+.logo-upload-area{border:1.5px dashed var(--soft);border-radius:14px;padding:20px;text-align:center;cursor:pointer;background:var(--surface);transition:border-color .15s}
+.logo-upload-area:hover{border-color:var(--fg)}
+.logo-upload-area strong{display:block;font-size:14px;margin-bottom:4px}
+.logo-upload-area p{font-size:12px;color:var(--mid)}
+.logo-preview-box{margin-top:12px;display:none;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.logo-preview-box img{max-height:40px;max-width:80px;border-radius:6px}
+.logo-preview-box span{font-size:12px;color:var(--mid);flex:1}
+
 /* ins footer */
 .ins-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--mid);line-height:1.7}
 .ins-footer a{color:var(--fg);font-weight:500}
@@ -330,11 +339,11 @@ textarea{resize:vertical}
       </div>
     </div>
 
- 
 
     <div class="ins-footer">
       <strong style="color:var(--fg)">adambirgün · QR Studio</strong><br/>
       Antalya · Ücretsiz QR üretimi<br/>
+      <a href="mailto:isletmemkolay@gmil.com">isletmemkolay@gmil.com</a>
     </div>
   </aside>
 </div>
@@ -416,10 +425,6 @@ document.getElementById('qrLogoDrop').addEventListener('click',()=>document.getE
 document.getElementById('qrLogoFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{qrLogo=r.result;document.getElementById('qrLogoPreviewImg').src=r.result;document.getElementById('qrLogoFileName').textContent=f.name;document.getElementById('qrLogoPreviewBox').style.display='flex';render();};r.readAsDataURL(f);});
 document.getElementById('clearQrLogo').addEventListener('click',()=>{qrLogo='';document.getElementById('qrLogoFile').value='';document.getElementById('qrLogoPreviewBox').style.display='none';render();});
 
-// Site logo
-document.getElementById('siteLogoDrop').addEventListener('click',()=>document.getElementById('siteLogoFile').click());
-document.getElementById('siteLogoFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('siteLogoImg').src=r.result;document.getElementById('siteLogoFileName').textContent=f.name;document.getElementById('siteLogoPreviewBox').style.display='flex';document.getElementById('siteLogoHeaderImg').src=r.result;document.getElementById('siteLogoHeader').style.display='block';};r.readAsDataURL(f);});
-document.getElementById('clearSiteLogo').addEventListener('click',()=>{document.getElementById('siteLogoFile').value='';document.getElementById('siteLogoPreviewBox').style.display='none';document.getElementById('siteLogoHeader').style.display='none';});
 
 // Export background mode
 document.getElementById('bgSolidBtn').addEventListener('click',()=>{transparentBg=false;document.getElementById('bgSolidBtn').classList.add('on');document.getElementById('bgTransparentBtn').classList.remove('on');render();});
